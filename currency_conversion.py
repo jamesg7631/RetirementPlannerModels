@@ -36,13 +36,13 @@ def get_monthly_fx_returns(ticker: str, start: str, end: str) -> pd.Series:
     monthly_fx_returns.name = 'FX_Return' # Name the series for merging
     return monthly_fx_returns
 
-def convert_usd_to_gbp_returns(asset_ticker: str, fx_returns_series: pd.Series):
+def convert_usd_to_gbp_returns(asset_ticker: str, currency_conversion: str):
     """
     Loads monthly returns for a USD-denominated asset, converts them to GBP returns
     using the provided FX returns, and saves the new GBP returns to a CSV.
     """
     input_file_name = f"{asset_ticker}_monthly_returns.csv"
-    
+    currency_conversion = f"{currency_conversion}_monthly_returns.csv"
     if not os.path.exists(input_file_name):
         print(f"Error: Monthly returns CSV for {asset_ticker} not found at {input_file_name}. Skipping conversion.")
         return
@@ -51,14 +51,16 @@ def convert_usd_to_gbp_returns(asset_ticker: str, fx_returns_series: pd.Series):
         # Load the monthly returns for the USD asset
         # Ensure 'Date' is parsed as datetime and set as index
         usd_returns_df = pd.read_csv(input_file_name, index_col='Date', parse_dates=True)
+        usd_to_gbp_df = pd.read_csv(currency_conversion, index_col='Date', parse_dates=True)
         # Assuming the returns column is named 'Monthly_Return' from previous step
         usd_returns_series = usd_returns_df['Monthly_Returns']
+        usd_to_gbp_series = usd_to_gbp_df['Monthly_Returns']
 
         # Align the FX returns with the USD asset returns
         # This will automatically handle any date mismatches by creating NaNs
         combined_data = pd.DataFrame({
             'USD_Return': usd_returns_series,
-            'FX_Return': fx_returns_series
+            'FX_Return': usd_to_gbp_series
         }).dropna() # Drop rows where either USD return or FX return is missing
 
         # Ensure we have enough data after merging
@@ -83,17 +85,17 @@ def convert_usd_to_gbp_returns(asset_ticker: str, fx_returns_series: pd.Series):
 
 # --- Main Execution ---
 
-print(f"--- Step 1: Getting monthly FX returns for {fx_ticker_symbol} ---")
-try:
-    monthly_gbpusd_returns = get_monthly_fx_returns(fx_ticker_symbol, "2010-11-01", '2025-06-21')
-    print(f"FX returns obtained from {monthly_gbpusd_returns.index.min().strftime('%Y-%m')} to {monthly_gbpusd_returns.index.max().strftime('%Y-%m')}")
-except Exception as e:
-    print(f"Failed to get FX data. Cannot proceed with conversions: {e}")
-    exit() # Exit if FX data cannot be obtained
-
+# print(f"--- Step 1: Getting monthly FX returns for {fx_ticker_symbol} ---")
+# try:
+#     monthly_gbpusd_returns = get_monthly_fx_returns(fx_ticker_symbol, "2010-11-01", '2025-06-21')
+#     print(f"FX returns obtained from {monthly_gbpusd_returns.index.min().strftime('%Y-%m')} to {monthly_gbpusd_returns.index.max().strftime('%Y-%m')}")
+# except Exception as e:
+#     print(f"Failed to get FX data. Cannot proceed with conversions: {e}")
+#     exit() # Exit if FX data cannot be obtained
+GBP_to_USD = 'GBPUSD=X'
 print("\n--- Step 2: Converting USD asset monthly returns to GBP ---")
 for ticker in asset_tickers_to_convert:
-    convert_usd_to_gbp_returns(ticker, monthly_gbpusd_returns)
+    convert_usd_to_gbp_returns(ticker, GBP_to_USD)
 
 print(f"\n--- All specified USD asset conversions to GBP complete. IUKP.L remains in original GBP. ---")
 

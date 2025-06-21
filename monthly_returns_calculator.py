@@ -2,6 +2,7 @@ import yfinance as yf
 import pandas as pd
 
 ticker_symbol_list = ['^IRX', 'AGG', 'LQD', 'HYG', 'IWDA.L', 'EEM', 'VNQI', 'DBC', 'GLD', 'IUKP.L', 'IGF'] # AGG will require currency conversion EEM data looks strange. Remember I converting to monthly adjusted closing anyway
+GBP_to_USD = 'GBPUSD=X'
 
 def process_ticker_to_monthly_returns(ticker_symbol: str, start_date: str, end_date: str):
     """
@@ -64,5 +65,7 @@ end_date_for_download = '2025-06-21' # Current date based on your context
 print(f"--- Starting data download and monthly return conversion from {start_date_for_download} to {end_date_for_download} ---")
 for ticker in ticker_symbol_list:
     process_ticker_to_monthly_returns(ticker, start_date_for_download, end_date_for_download)
+
+process_ticker_to_monthly_returns(GBP_to_USD, start_date_for_download, end_date_for_download)
 
 print("\n--- All monthly return CSVs created ---")
