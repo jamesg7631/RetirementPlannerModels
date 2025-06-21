@@ -36,7 +36,7 @@ def process_ticker_to_monthly_returns(ticker_symbol: str, start_date: str, end_d
         monthly_returns = monthly_returns.dropna()
         # monthly_returns.columns[0] = 'Month'
         print(monthly_returns.columns[0])
-        monthly_returns = monthly_returns.rename(columns={monthly_returns.columns[0]: 'Monthly_Returns'})
+        monthly_returns = monthly_returns.rename(columns={monthly_returns.columns[0]: 'Monthly_Return'})
 
         # Display first few monthly returns
         print(f"\nMonthly Returns for {ticker_symbol} (Head):\n{monthly_returns.head()}")
