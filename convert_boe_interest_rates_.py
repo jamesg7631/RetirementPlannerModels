@@ -30,14 +30,12 @@ def read_boe(filepath):
         return interest_rates
 
 def obtain_monthly_cash_accrual(interest_rate_data: list, starting_date, end_date):
-    current_list_index = len(interest_rate_data) -1
+    current_list_index = 0
     month_starting_date = datetime(year=starting_date.year, month = starting_date.month, day=1)
-    for i in range(len(interest_rate_data) -1, -1, -1):
-        current_list_index = i
-        entry = interest_rate_data[i]
-        entry_date = entry.date
-        if entry_date > starting_date:
-            current_list_index += 1
+
+    for i, entry in enumerate(interest_rate_data):
+        if entry.date <= starting_date:
+            current_rate_index = i
             break
 
     next_month = month_starting_date + relativedelta(months=1)
