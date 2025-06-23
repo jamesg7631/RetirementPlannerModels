@@ -7,3 +7,5 @@ Steps
 3. Move all files in GBP to common folder
 
 I need to fix monthly accumulation to take into account leap years
+
+Moneymarket forecast has been done without spread. I need to add this
