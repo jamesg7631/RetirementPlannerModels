@@ -3,8 +3,11 @@ from dateutil.relativedelta import relativedelta
 import calendar
 
 def main():
-     boe_data = read_boe("interest_rates/BOE_rates_original.csv")
-     print()
+    boe_data = read_boe("interest_rates/BOE_rates_original.csv")
+    starting_date = datetime(2010, 11,1)
+    end_date = datetime(2025,6,21)
+    monthly_acculations = obtain_monthly_cash_accrual(boe_data, starting_date, end_date)
+    print()
       
 
 class BOEInterestRate:
@@ -16,12 +19,8 @@ class BOEInterestRate:
 def read_boe(filepath):
         interest_rates = []
         with open(filepath) as new_file:
-            start_reading = False
+            next(new_file)
             for line in new_file:
-                if start_reading == False:
-                     start_reading = True
-                     continue
-
                 items = line.split(',')
                 original_date = items[0]
                 date_obj = datetime.strptime(original_date, "%d %b %y")
@@ -30,16 +29,16 @@ def read_boe(filepath):
 
         return interest_rates
 
-def obtain_monthly_cash_accrual(interest_rate_data: list, starting_date):
+def obtain_monthly_cash_accrual(interest_rate_data: list, starting_date, end_date):
     current_list_index = None
     month_starting_date = datetime(year=starting_date.year, month = starting_date.month, day=1)
-    for i in range(len(interest_rate_data) -1, -1, -1, -1):
+    for i in range(len(interest_rate_data) -1, -1, -1):
         current_list_index = i
         entry = interest_rate_data[i]
         entry_date = entry.date
         if entry_date > starting_date:
+            current_list_index += 1
             break
-        current_interest_rate = entry.annual_rate
 
     next_month = month_starting_date + relativedelta(months=1)
 
@@ -47,24 +46,24 @@ def obtain_monthly_cash_accrual(interest_rate_data: list, starting_date):
     monthly_accumulations = []
     current_day = month_starting_date
     current_interest_rate_entry = interest_rate_data[current_list_index]
-    boe_interest_rate_change_date = current_interest_rate_entry.date
+    boe_interest_rate_change_entry = interest_rate_data[current_list_index - 1]
     monthly_accumulation = 1
     final_month = first_day_of_next_month(datetime.now())
     while current_day < final_month:
         while current_day < next_month:
-            boe_interest_rate_change_date = current_interest_rate_entry.date
-            if current_day >= boe_interest_rate_change_date:
+            boe_interest_rate_change_date = boe_interest_rate_change_entry.date
+            if current_day >= boe_interest_rate_change_date or boe_interest_rate_change_date == None:
                 current_list_index = current_list_index -1
                 #If the below is reached, we have no further changes in Bank of England interest rates
                 if current_list_index < 0:
                     break
-                current_interest_rate_entry = interest_rate_data[current_list_index].annual_rate
-            monthly_accumulation *= (1 + (current_interest_rate_entry.annual_rate / 100)**(1/365)) ## Fix this later for leap
+                current_interest_rate_entry = interest_rate_data[current_list_index]
+            monthly_accumulation *= (1 + (current_interest_rate_entry.annual_rate / 100))**(1/365) ## Fix this later for leap
+            current_day = current_day + relativedelta(days=1)
+        final_date_in_month = next_month - relativedelta(days=1)
         next_month = next_month + relativedelta(months=1)
-
-        final_date_in_month = next_month - relativedelta(day=1)
         monthly_accumulation_entry = BOEInterestRate(final_date_in_month, monthly_accumulation)
-        monthly_accumulation.append(monthly_accumulation_entry)
+        monthly_accumulations.append(monthly_accumulation_entry)
 
     return monthly_accumulations
 
