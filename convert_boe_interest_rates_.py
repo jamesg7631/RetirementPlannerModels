@@ -5,7 +5,7 @@ import calendar
 def main():
     boe_data = read_boe("interest_rates/BOE_rates_original.csv")
     starting_date = datetime(2010, 11,1)
-    end_date = datetime(2025,6,21)
+    end_date = datetime(2025,6,30)
     monthly_acculations = obtain_monthly_cash_accrual(boe_data, starting_date, end_date)
     print()
       
@@ -30,39 +30,68 @@ def read_boe(filepath):
         return interest_rates
 
 def obtain_monthly_cash_accrual(interest_rate_data: list, starting_date, end_date):
-    current_list_index = 0
-    month_starting_date = datetime(year=starting_date.year, month = starting_date.month, day=1)
+    if not interest_rate_data:
+        return [] # Handle empty interest rate data
 
+    monthly_accumulations = []
+    
+    # 1. Determine the initial current_rate_index
+    # Find the latest rate change ON or BEFORE the starting_date.
+    # Since interest_rate_data is DESCENDING, we iterate and take the first one found.
+    current_rate_index = len(interest_rate_data) - 1 # Default to the oldest rate if starting_date is earlier than all
     for i, entry in enumerate(interest_rate_data):
         if entry.date <= starting_date:
             current_rate_index = i
             break
+    # After this loop, interest_rate_data[current_rate_index] is the rate active at starting_date.
 
-    next_month = month_starting_date + relativedelta(months=1)
+    # 2. Set up the monthly iteration
+    # Start calculations from the beginning of the month of starting_date, but not before starting_date itself.
+    current_month_first_day = datetime(starting_date.year, starting_date.month, 1)
+    
+    # Loop month by month
+    # We want to go until the month that contains end_date
+    while current_month_first_day <= end_date:
+        monthly_accumulation_factor = 1.0 # Reset for each new month
 
-    # Find monthly accumulation
-    monthly_accumulations = []
-    current_day = month_starting_date
-    current_interest_rate_entry = interest_rate_data[current_list_index]
-    boe_interest_rate_change_entry = interest_rate_data[current_list_index - 1]
-    monthly_accumulation = 1
-    final_month = first_day_of_next_month(datetime.now())
-    while current_day < final_month:
-        while current_day < next_month:
-            boe_interest_rate_change_date = boe_interest_rate_change_entry.date
-            if current_day >= boe_interest_rate_change_date or boe_interest_rate_change_date == None:
-                current_list_index = current_list_index -1
-                #If the below is reached, we have no further changes in Bank of England interest rates
-                if current_list_index < 0:
-                    break
-                current_interest_rate_entry = interest_rate_data[current_list_index]
-            days_in_year = 366 if calendar.isleap(current_day.year) else 365
-            monthly_accumulation *= (1 + (current_interest_rate_entry.annual_rate / 100))**(1/days_in_year)
-            current_day = current_day + relativedelta(days=1)
-        final_date_in_month = next_month - relativedelta(days=1)
-        next_month = next_month + relativedelta(months=1)
-        monthly_accumulation_entry = BOEInterestRate(final_date_in_month, monthly_accumulation)
-        monthly_accumulations.append(monthly_accumulation_entry)
+        # Determine the actual start day for daily accrual in this month
+        # It's either the starting_date itself (for the first month) or the 1st of the current month
+        day_for_daily_accrual_start = max(current_month_first_day, starting_date)
+
+        # Determine the actual end day for daily accrual in this month
+        # This is the last day of the current_month_first_day, but not exceeding end_date.
+        next_month_first_day = current_month_first_day + relativedelta(months=1)
+        day_for_daily_accrual_end = min(next_month_first_day - relativedelta(days=1), end_date)
+
+        current_day_in_loop = day_for_daily_accrual_start
+
+        # Loop day by day within the effective period of the current month
+        while current_day_in_loop <= day_for_daily_accrual_end:
+            # Update current_rate_index if a *newer* rate has become active on or before current_day_in_loop.
+            # We are moving BACKWARDS (towards index 0) in the list as dates get newer.
+            while current_rate_index > 0 and \
+                  interest_rate_data[current_rate_index - 1].date <= current_day_in_loop:
+                current_rate_index -= 1
+            
+            current_interest_rate_entry = interest_rate_data[current_rate_index]
+            annual_rate = current_interest_rate_entry.annual_rate
+            
+            # Apply daily accrual, handling leap years
+            days_in_year = 366 if calendar.isleap(current_day_in_loop.year) else 365
+            monthly_accumulation_factor *= (1 + (annual_rate / 100))**(1/days_in_year)
+            
+            current_day_in_loop += relativedelta(days=1)
+        
+        # Store the monthly accumulation if we processed any days in this month
+        # The date for the entry should be the last day for which accumulation was done in this month.
+        if day_for_daily_accrual_start <= day_for_daily_accrual_end: # Check if any days were processed
+            # The date associated with the monthly accumulation should be the last day of the period
+            # this accumulation covers within that month.
+            accumulation_end_date = day_for_daily_accrual_end # This makes sense for a monthly "total"
+            monthly_accumulations.append(BOEInterestRate(accumulation_end_date, monthly_accumulation_factor))
+        
+        # Move to the next calendar month for the outer loop
+        current_month_first_day = next_month_first_day
 
     return monthly_accumulations
 
