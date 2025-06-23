@@ -5,3 +5,5 @@ Steps
 1. monthly_returns_calculator.py
 2. currency_conversion.py
 3. Move all files in GBP to common folder
+
+I need to fix monthly accumulation to take into account leap years
