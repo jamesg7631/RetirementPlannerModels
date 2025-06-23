@@ -4,9 +4,10 @@ import calendar
 
 def main():
     boe_data = read_boe("interest_rates/BOE_rates_original.csv")
-    starting_date = datetime(2010, 11,1)
+    starting_date = datetime(2010, 12,1)
     end_date = datetime(2025,6,30)
-    monthly_acculations = obtain_monthly_cash_accrual(boe_data, starting_date, end_date)
+    monthly_accumulations = obtain_monthly_cash_accrual(boe_data, starting_date, end_date)
+    write_interest_rates('gbp_monthly_returns/Moneymarket_monthly_returns_GBP.csv', monthly_accumulations)
     print()
       
 
@@ -101,6 +102,16 @@ def first_day_of_next_month(dt=None):
     year = dt.year + (dt.month == 12)
     month = 1 if dt.month == 12 else dt.month + 1
     return datetime(year, month, 1)
+
+def write_interest_rates(filepath, monthly_accumulations):
+    with open(filepath, 'w') as new_file:
+        new_file.write("Date,Monthly_Return\n")
+        for entry in monthly_accumulations:
+            date_string = entry.date.strftime('%Y-%m-%d')
+            monthly_accumulation = entry.annual_rate
+            entry_string = f"{date_string},{monthly_accumulation}\n"
+            new_file.write(entry_string)
+
 
 
 
