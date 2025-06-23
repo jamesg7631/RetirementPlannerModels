@@ -4,6 +4,8 @@ import os
 from scipy.optimize import minimize
 import matplotlib.pyplot as plt
 
+asset_class_path = 'gbp_monthly_returns/'
+
 all_asset_classes_for_correlation = [
     'Moneymarket_monthly_returns_GBP.csv',
     'AGG_monthly_returns_GBP.csv',
@@ -22,16 +24,17 @@ def create_combined_returns_df(file_list: list):
     all_returns = {}
     for filename in file_list:
         try:
+            file_path = asset_class_path + filename
             ticker_name = filename.replace('_monthly_returns_GBP.csv', '').replace('_monthly_returns.csv', '')
-            df = pd.read_csv(filename, index_col='Date', parse_dates=True)
+            df = pd.read_csv(file_path, index_col='Date', parse_dates=True)
             if 'Monthly_Return' in df.columns:
                 all_returns[ticker_name] = df['Monthly_Return']
             else:
-                print(f"Warning: No recognised return column in {filename}. Skipping.")
+                print(f"Warning: No recognised return column in {file_path}. Skipping.")
         except FileNotFoundError:
-            print(f"Error: File not found for {filename}. Skipping.")
+            print(f"Error: File not found for {file_path}. Skipping.")
         except Exception as e:
-            print(f"Error processing {filename}: {e}")
+            print(f"Error processing {file_path}: {e}")
 
     # Combine all series into a single DataFrame
     combined_df = pd.DataFrame(all_returns)
