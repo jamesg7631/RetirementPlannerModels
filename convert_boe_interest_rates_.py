@@ -30,7 +30,7 @@ def read_boe(filepath):
         return interest_rates
 
 def obtain_monthly_cash_accrual(interest_rate_data: list, starting_date, end_date):
-    current_list_index = None
+    current_list_index = len(interest_rate_data) -1
     month_starting_date = datetime(year=starting_date.year, month = starting_date.month, day=1)
     for i in range(len(interest_rate_data) -1, -1, -1):
         current_list_index = i
@@ -58,7 +58,8 @@ def obtain_monthly_cash_accrual(interest_rate_data: list, starting_date, end_dat
                 if current_list_index < 0:
                     break
                 current_interest_rate_entry = interest_rate_data[current_list_index]
-            monthly_accumulation *= (1 + (current_interest_rate_entry.annual_rate / 100))**(1/365) ## Fix this later for leap
+            days_in_year = 366 if calendar.isleap(current_day.year) else 365
+            monthly_accumulation *= (1 + (current_interest_rate_entry.annual_rate / 100))**(1/days_in_year)
             current_day = current_day + relativedelta(days=1)
         final_date_in_month = next_month - relativedelta(days=1)
         next_month = next_month + relativedelta(months=1)
