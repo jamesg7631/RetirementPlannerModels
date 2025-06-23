@@ -5,7 +5,6 @@ import os
 # Define the list of tickers for which you have monthly return CSVs
 # Based on your latest confirmation, all of these except IUKP.L are USD-denominated
 asset_tickers_to_convert = [
-    '_IRX',  # Represents ^IRX in filename
     'AGG',
     'LQD',
     'HYG',
@@ -41,8 +40,8 @@ def convert_usd_to_gbp_returns(asset_ticker: str, currency_conversion: str):
     Loads monthly returns for a USD-denominated asset, converts them to GBP returns
     using the provided FX returns, and saves the new GBP returns to a CSV.
     """
-    input_file_name = f"{asset_ticker}_monthly_returns.csv"
-    currency_conversion = f"{currency_conversion}_monthly_returns.csv"
+    input_file_name = f"monthly_returns/{asset_ticker}_monthly_returns.csv"
+    currency_conversion = f"monthly_returns/{currency_conversion}_monthly_returns.csv"
     if not os.path.exists(input_file_name):
         print(f"Error: Monthly returns CSV for {asset_ticker} not found at {input_file_name}. Skipping conversion.")
         return
@@ -76,7 +75,7 @@ def convert_usd_to_gbp_returns(asset_ticker: str, currency_conversion: str):
         gbp_returns_series.name = 'Monthly_Return' # Name for the new CSV header
 
         # Save the converted GBP returns to a new CSV
-        output_file_name = f"{asset_ticker}_monthly_returns_GBP.csv"
+        output_file_name = f"gbp_monthly_returns/{asset_ticker}_monthly_returns_GBP.csv"
         gbp_returns_series.to_csv(output_file_name)
         print(f"Converted monthly returns for {asset_ticker} to GBP and saved to {output_file_name}")
 

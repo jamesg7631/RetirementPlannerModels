@@ -5,7 +5,7 @@ from scipy.optimize import minimize
 import matplotlib.pyplot as plt
 
 all_asset_classes_for_correlation = [
-    '_IRX_monthly_returns_GBP.csv',
+    'Moneymarket_monthly_returns_GBP.csv',
     'AGG_monthly_returns_GBP.csv',
     'LQD_monthly_returns_GBP.csv',
     'HYG_monthly_returns_GBP.csv',
@@ -15,7 +15,7 @@ all_asset_classes_for_correlation = [
     'DBC_monthly_returns_GBP.csv',
     'GLD_monthly_returns_GBP.csv',
     'IGF_monthly_returns_GBP.csv',
-    'IUKP.L_monthly_returns.csv' # This one is already in GBP
+    'IUKP.L_monthly_returns.csv', # This one is already in GBP
 ]
 
 def create_combined_returns_df(file_list: list):
@@ -23,7 +23,6 @@ def create_combined_returns_df(file_list: list):
     for filename in file_list:
         try:
             ticker_name = filename.replace('_monthly_returns_GBP.csv', '').replace('_monthly_returns.csv', '')
-
             df = pd.read_csv(filename, index_col='Date', parse_dates=True)
             if 'Monthly_Return' in df.columns:
                 all_returns[ticker_name] = df['Monthly_Return']

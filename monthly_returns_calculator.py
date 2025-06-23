@@ -1,7 +1,7 @@
 import yfinance as yf
 import pandas as pd
 
-ticker_symbol_list = ['^IRX', 'AGG', 'LQD', 'HYG', 'IWDA.L', 'EEM', 'VNQI', 'DBC', 'GLD', 'IUKP.L', 'IGF'] # AGG will require currency conversion EEM data looks strange. Remember I converting to monthly adjusted closing anyway
+ticker_symbol_list = ['AGG', 'LQD', 'HYG', 'IWDA.L', 'EEM', 'VNQI', 'DBC', 'GLD', 'IUKP.L', 'IGF'] # AGG will require currency conversion EEM data looks strange. Remember I converting to monthly adjusted closing anyway
 GBP_to_USD = 'GBPUSD=X'
 
 def process_ticker_to_monthly_returns(ticker_symbol: str, start_date: str, end_date: str):
@@ -44,7 +44,7 @@ def process_ticker_to_monthly_returns(ticker_symbol: str, start_date: str, end_d
 
 
         # Save the monthly returns to a new CSV file
-        monthly_file_name = f"{ticker_symbol}_monthly_returns.csv"
+        monthly_file_name = f"monthly_returns/{ticker_symbol}_monthly_returns.csv"
         # Replace '^' with '_' for valid filenames
         monthly_file_name = monthly_file_name.replace("^", "_")
 

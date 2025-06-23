@@ -5,7 +5,6 @@ import os
 # suggests I should maybe look at changing my asset classes later. For now, keep as is.
 
 all_asset_classes_for_correlation = [
-    '_IRX_monthly_returns_GBP.csv',
     'AGG_monthly_returns_GBP.csv',
     'LQD_monthly_returns_GBP.csv',
     'HYG_monthly_returns_GBP.csv',
