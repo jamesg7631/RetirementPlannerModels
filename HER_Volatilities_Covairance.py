@@ -169,5 +169,3 @@ plt.ylabel('Annualized Return')
 plt.grid(True)
 plt.legend()
 plt.show()
-
-/home/jamesg/repos/retirementplanner/yfinance/HER_Volatilities_Covairance.ipynb
