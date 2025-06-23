@@ -2,8 +2,9 @@ import pandas as pd
 import numpy as np
 import os
 
+returns_path = 'gbp_monthly_returns/'
 all_asset_classes_for_correlation = [
-    '_IRX_monthly_returns_GBP.csv',
+    'Moneymarket_monthly_returns_GBP.csv',
     'AGG_monthly_returns_GBP.csv',
     'LQD_monthly_returns_GBP.csv',
     'HYG_monthly_returns_GBP.csv',
@@ -21,16 +22,16 @@ def create_combined_returns_df(file_list: list):
     for filename in file_list:
         try:
             ticker_name = filename.replace('_monthly_returns_GBP.csv', '').replace('_monthly_returns.csv', '')
-
-            df = pd.read_csv(filename, index_col='Date', parse_dates=True)
+            filepath = returns_path + filename
+            df = pd.read_csv(filepath, index_col='Date', parse_dates=True)
             if 'Monthly_Return' in df.columns:
                 all_returns[ticker_name] = df['Monthly_Return']
             else:
                 print(f"Warning: No recognised return column in {filename}. Skipping.")
         except FileNotFoundError:
-            print(f"Error: File not found for {filename}. Skipping.")
+            print(f"Error: File not found for {filepath}. Skipping.")
         except Exception as e:
-            print(f"Error processing {filename}: {e}")
+            print(f"Error processing {filepath}: {e}")
 
     # Combine all series into a single DataFrame
     combined_df = pd.DataFrame(all_returns)
