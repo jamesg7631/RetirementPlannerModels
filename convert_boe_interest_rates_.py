@@ -108,17 +108,8 @@ def write_interest_rates(filepath, monthly_accumulations):
         new_file.write("Date,Monthly_Return\n")
         for entry in monthly_accumulations:
             date_string = entry.date.strftime('%Y-%m-%d')
-            monthly_accumulation = entry.annual_rate
+            monthly_accumulation = entry.annual_rate -1
             entry_string = f"{date_string},{monthly_accumulation}\n"
             new_file.write(entry_string)
-
-
-
-
-    
-
-    
-
-
 
 main()

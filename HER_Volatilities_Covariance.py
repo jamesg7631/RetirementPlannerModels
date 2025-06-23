@@ -156,7 +156,7 @@ efficient_frontier.drop_duplicates(subset=['Volatility'], inplace=True)
 efficient_frontier.sort_values(by='Volatility', inplace=True)
 
 print("\nApproximate Efficient Frontier (first 5 points):")
-print(efficient_frontier.head())
+print(efficient_frontier)
 
 # Plotting the efficient frontier
 
@@ -171,3 +171,32 @@ plt.ylabel('Annualized Return')
 plt.grid(True)
 plt.legend()
 plt.show()
+
+risk_band_definitions = {
+    # Risk Level: {'vol_min': X, 'vol_max': Y, 'dd_max': Z}
+    # Volatility is from the plot. dd_max you will verify after running the next code.
+    1: {'vol_min': 0.090, 'vol_max': 0.100, 'dd_max': -0.075}, # ~9.0% to 10.0% Vol, Max 7.5% DD
+    2: {'vol_min': 0.100, 'vol_max': 0.110, 'dd_max': -0.100}, # ~10.0% to 11.0% Vol, Max 10% DD
+    3: {'vol_min': 0.110, 'vol_max': 0.120, 'dd_max': -0.125}, # ~11.0% to 12.0% Vol, Max 12.5% DD
+    4: {'vol_min': 0.120, 'vol_max': 0.130, 'dd_max': -0.150}, # ~12.0% to 13.0% Vol, Max 15% DD
+    5: {'vol_min': 0.130, 'vol_max': 0.140, 'dd_max': -0.175}, # ~13.0% to 14.0% Vol, Max 17.5% DD
+    6: {'vol_min': 0.140, 'vol_max': 0.150, 'dd_max': -0.200}, # ~14.0% to 15.0% Vol, Max 20% DD
+    7: {'vol_min': 0.150, 'vol_max': 0.160, 'dd_max': -0.250}, # ~15.0% to 16.0% Vol, Max 25% DD
+    8: {'vol_min': 0.160, 'vol_max': 0.170, 'dd_max': -0.300}, # ~16.0% to 17.0% Vol, Max 30% DD
+    9: {'vol_min': 0.170, 'vol_max': 0.180, 'dd_max': -0.350}, # ~17.0% to 18.0% Vol, Max 35% DD
+    10: {'vol_min': 0.180, 'vol_max': 1.0, 'dd_max': -1.0}    # >18.0% Vol, more than 35% DD
+}
+
+# Your `target_volatilities_for_risk_levels` would also align with these:
+target_volatilities_for_risk_levels = {
+    1: 0.095,  # ~9.5%
+    2: 0.105,  # ~10.5%
+    3: 0.115,  # ~11.5%
+    4: 0.125,  # ~12.5%
+    5: 0.135,  # ~13.5%
+    6: 0.145,  # ~14.5%
+    7: 0.155,  # ~15.5%
+    8: 0.165,  # ~16.5%
+    9: 0.175,  # ~17.5%
+    10: 0.185   # ~18.5%
+}
